@@ -14,7 +14,7 @@
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
   <Resources>
-    <Resource Language="x-generate" />
+    <Resource Language="en-US" />
   </Resources>
   <Applications>
     <Application Id="chimera" Executable="chimera.exe" EntryPoint="Windows.FullTrustApplication">
