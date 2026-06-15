@@ -51,7 +51,16 @@ if (Test-Path $layout) { Remove-Item -Recurse -Force $layout }
 New-Item -ItemType Directory -Path $layout | Out-Null
 Copy-Item $launcherExe (Join-Path $layout 'chimera.exe')
 Copy-Item $tarball (Join-Path $layout 'install.tar.gz')
-Copy-Item (Join-Path $ScriptRoot 'DistroLauncher-Appx\MyDistro.appxmanifest') (Join-Path $layout 'AppxManifest.xml')
+# Auto-bump the manifest Version's build number to the current minute since
+# 2024-01-01 so each rebuild produces a strictly higher version. Without
+# this, Add-AppxPackage silently no-ops on re-install of the same version.
+$mfPath = Join-Path $ScriptRoot 'DistroLauncher-Appx\MyDistro.appxmanifest'
+$mfXml  = Get-Content $mfPath -Raw
+$build  = [int]([DateTime]::UtcNow - [DateTime]'2024-01-01Z').TotalMinutes
+$mfXml  = $mfXml -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$build.0`""
+$layoutManifest = Join-Path $layout 'AppxManifest.xml'
+Set-Content -Path $layoutManifest -Value $mfXml -Encoding UTF8 -NoNewline
+Say "manifest version 1.0.$build.0"
 Copy-Item -Recurse (Join-Path $ScriptRoot 'DistroLauncher-Appx\Assets') $layout
 
 # MakeAppx (without resources.pri / MakePri) wants the base-name files the
