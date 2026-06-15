@@ -9,17 +9,12 @@ bool DistributionInfo::CreateUser(std::wstring_view userName)
 {
     DWORD exitCode;
 
-    // Chimera's full ROOTFS ships /bin/sh (chimerautils mksh-like) but not
-    // /bin/bash. We want bash as the user's login shell, so install it
-    // first via apk. Network may not be configured yet on first launch --
-    // ignore the exit code; useradd will warn but still create the account
-    // if bash is missing, and the user can install it later.
-    g_wslApi.WslLaunchInteractive(L"/bin/sh -c \"apk update && apk add bash\"", true, &exitCode);
-
     // Create the user account with home dir, wheel group (for doas), users
-    // group, and bash as the login shell. Chimera ships shadow's useradd in
-    // /usr/sbin/, not Debian's adduser.
-    std::wstring commandLine = L"/usr/sbin/useradd -m -G wheel,users -s /bin/bash ";
+    // group, and /bin/sh as the login shell. Chimera's ROOTFS always has
+    // /bin/sh (chimerautils mksh-like). We try to install bash and chsh
+    // after, but if that fails (network down, repo flake) the account is
+    // still usable. Chimera ships shadow's useradd in /usr/sbin/.
+    std::wstring commandLine = L"/usr/sbin/useradd -m -G wheel,users -s /bin/sh ";
     commandLine += userName;
     HRESULT hr = g_wslApi.WslLaunchInteractive(commandLine.c_str(), true, &exitCode);
     if ((FAILED(hr)) || (exitCode != 0)) {
@@ -43,6 +38,15 @@ bool DistributionInfo::CreateUser(std::wstring_view userName)
     g_wslApi.WslLaunchInteractive(
         L"/bin/sh -c \"echo 'permit persist :wheel' > /etc/doas.conf && chmod 0400 /etc/doas.conf\"",
         true, &exitCode);
+
+    // Try to install bash and switch the user to it. If apk fails (network
+    // down on first boot, repo flake), the user keeps /bin/sh as login
+    // shell and can install bash + chsh later. Ignore exit codes -- this
+    // is best-effort polish, not a registration blocker.
+    std::wstring bashSetup = L"/bin/sh -c \"apk update >/dev/null 2>&1 && apk add -q bash && chsh -s /bin/bash ";
+    bashSetup += userName;
+    bashSetup += L"\"";
+    g_wslApi.WslLaunchInteractive(bashSetup.c_str(), true, &exitCode);
 
     return true;
 }
