@@ -9,6 +9,14 @@ bool DistributionInfo::CreateUser(std::wstring_view userName)
 {
     DWORD exitCode;
 
+    // Chimera's full ROOTFS ships /bin/sh (chimerautils mksh-like) but not
+    // /bin/bash. We want bash as the user's login shell, so install it
+    // first via apk. Network may not be configured yet on first launch --
+    // ignore the exit code; useradd will warn but still create the account
+    // if bash is missing, and the user can install it later.
+    g_wslApi.WslLaunchInteractive(L"/sbin/apk update", true, &exitCode);
+    g_wslApi.WslLaunchInteractive(L"/sbin/apk add bash", true, &exitCode);
+
     // Create the user account with home dir, wheel group (for doas), users
     // group, and bash as the login shell. Chimera ships shadow's useradd in
     // /usr/sbin/, not Debian's adduser.
