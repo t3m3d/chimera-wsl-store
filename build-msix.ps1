@@ -56,11 +56,12 @@ Copy-Item $tarball (Join-Path $layout 'install.tar.gz')
 # this, Add-AppxPackage silently no-ops on re-install of the same version.
 $mfPath = Join-Path $ScriptRoot 'DistroLauncher-Appx\MyDistro.appxmanifest'
 $mfXml  = Get-Content $mfPath -Raw
-$build  = [int]([DateTime]::UtcNow - [DateTime]'2024-01-01Z').TotalMinutes
-$mfXml  = $mfXml -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$build.0`""
+$days = [int]([DateTime]::UtcNow - [DateTime]'2024-01-01Z').TotalDays
+$mod  = [int]([DateTime]::UtcNow.TimeOfDay.TotalMinutes)
+$mfXml  = $mfXml -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$days.$mod`""
 $layoutManifest = Join-Path $layout 'AppxManifest.xml'
 Set-Content -Path $layoutManifest -Value $mfXml -Encoding UTF8 -NoNewline
-Say "manifest version 1.0.$build.0"
+Say "manifest version 1.0.$days.$mod"
 Copy-Item -Recurse (Join-Path $ScriptRoot 'DistroLauncher-Appx\Assets') $layout
 
 # MakeAppx (without resources.pri / MakePri) wants the base-name files the
