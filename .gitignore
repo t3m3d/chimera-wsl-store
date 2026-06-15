@@ -1,0 +1,13 @@
+x64/install.tar.gz
+ARM64/install.tar.gz
+*.pfx
+AppPackages/
+BundleArtifacts/
+Generated Files/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+.vs/
+*.user
+*.suo
