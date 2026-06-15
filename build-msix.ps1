@@ -67,7 +67,7 @@ $mfXml  = Get-Content $mfPath -Raw
 # Hours since 2024-01-01 fits u16 until ~2031. Two builds within the same
 # hour collide -- if that happens during dev, wait 60 min or bump source.
 $hours = [int]([DateTime]::UtcNow - [DateTime]'2024-01-01Z').TotalHours
-$mfXml  = $mfXml -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$hours.0`""
+$mfXml  = $mfXml -replace '\bVersion="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$hours.0`""
 $layoutManifest = Join-Path $layout 'AppxManifest.xml'
 Set-Content -Path $layoutManifest -Value $mfXml -Encoding UTF8 -NoNewline
 Say "manifest version 1.0.$hours.0"
