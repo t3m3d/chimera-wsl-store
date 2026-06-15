@@ -2,6 +2,7 @@ x64/install.tar.gz
 ARM64/install.tar.gz
 *.pfx
 AppPackages/
+msix-layout/
 BundleArtifacts/
 Generated Files/
 [Bb]in/

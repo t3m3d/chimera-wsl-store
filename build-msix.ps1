@@ -63,12 +63,14 @@ Copy-Item $tarball (Join-Path $layout 'install.tar.gz')
 # this, Add-AppxPackage silently no-ops on re-install of the same version.
 $mfPath = Join-Path $ScriptRoot 'DistroLauncher-Appx\MyDistro.appxmanifest'
 $mfXml  = Get-Content $mfPath -Raw
-$days = [int]([DateTime]::UtcNow - [DateTime]'2024-01-01Z').TotalDays
-$mod  = [int]([DateTime]::UtcNow.TimeOfDay.TotalMinutes)
-$mfXml  = $mfXml -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$days.$mod`""
+# Store rejects revision != 0, so encode time in the build slot only.
+# Hours since 2024-01-01 fits u16 until ~2031. Two builds within the same
+# hour collide -- if that happens during dev, wait 60 min or bump source.
+$hours = [int]([DateTime]::UtcNow - [DateTime]'2024-01-01Z').TotalHours
+$mfXml  = $mfXml -replace 'Version="\d+\.\d+\.\d+\.\d+"', "Version=`"1.0.$hours.0`""
 $layoutManifest = Join-Path $layout 'AppxManifest.xml'
 Set-Content -Path $layoutManifest -Value $mfXml -Encoding UTF8 -NoNewline
-Say "manifest version 1.0.$days.$mod"
+Say "manifest version 1.0.$hours.0"
 Copy-Item -Recurse (Join-Path $ScriptRoot 'DistroLauncher-Appx\Assets') $layout
 
 # MakeAppx (without resources.pri / MakePri) wants the base-name files the
