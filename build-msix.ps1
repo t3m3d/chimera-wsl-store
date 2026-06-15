@@ -36,8 +36,15 @@ Say "msbuild launcher ($Configuration|$Platform)"
 $launcherProj = Join-Path $ScriptRoot 'DistroLauncher\DistroLauncher.vcxproj'
 & msbuild $launcherProj /p:Configuration=$Configuration /p:Platform=$Platform /v:minimal /nologo
 if ($LASTEXITCODE -ne 0) { Fail "msbuild failed (rc=$LASTEXITCODE)" }
-$launcherExe = Join-Path $ScriptRoot "$Platform\$Configuration\chimera.exe"
-if (-not (Test-Path $launcherExe)) { Fail "expected chimera.exe at $launcherExe" }
+# msbuild on the .vcxproj directly resolves OutDir relative to the project,
+# so the launcher exe lands at DistroLauncher\<Platform>\<Configuration>\.
+# (When the .sln runs the build, it lands at <repo>\<Platform>\<Configuration>\.)
+# Try the project-relative path first, fall back to the solution-relative one.
+$launcherExe = Join-Path $ScriptRoot "DistroLauncher\$Platform\$Configuration\chimera.exe"
+if (-not (Test-Path $launcherExe)) {
+    $launcherExe = Join-Path $ScriptRoot "$Platform\$Configuration\chimera.exe"
+}
+if (-not (Test-Path $launcherExe)) { Fail "expected chimera.exe at DistroLauncher\$Platform\$Configuration\chimera.exe or $Platform\$Configuration\chimera.exe" }
 OK "built $launcherExe"
 
 # 2. Verify the rootfs tarball is staged.
