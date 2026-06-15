@@ -53,6 +53,16 @@ Copy-Item $launcherExe (Join-Path $layout 'chimera.exe')
 Copy-Item $tarball (Join-Path $layout 'install.tar.gz')
 Copy-Item (Join-Path $ScriptRoot 'DistroLauncher-Appx\MyDistro.appxmanifest') (Join-Path $layout 'AppxManifest.xml')
 Copy-Item -Recurse (Join-Path $ScriptRoot 'DistroLauncher-Appx\Assets') $layout
+
+# MakeAppx (without resources.pri / MakePri) wants the base-name files the
+# manifest references. The template ships only scale-100/125/150/200/400
+# variants. Copy each scale-100 to the unscaled base name so manifest
+# refs like 'Assets\StoreLogo.png' resolve.
+$assetsDir = Join-Path $layout 'Assets'
+Get-ChildItem $assetsDir -Filter '*.scale-100.png' | ForEach-Object {
+    $base = $_.Name -replace '\.scale-100\.png$','.png'
+    Copy-Item -Force $_.FullName (Join-Path $assetsDir $base)
+}
 OK "layout: $layout"
 
 # 4. Pack the MSIX.
