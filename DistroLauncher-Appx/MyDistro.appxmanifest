@@ -3,7 +3,7 @@
   <Identity Name="t3m3d.ChimeraLinuxWSL" Version="1.0.0.0" Publisher="CN=97613709-C254-4F66-AB6B-1EE4BA3D003F" ProcessorArchitecture="x64" />
   <mp:PhoneIdentity PhoneProductId="160867c6-4e75-4e36-85c6-1543de07d5f3" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>Chimera Linux</DisplayName>
+    <DisplayName>Chimera Linux WSL</DisplayName>
     <PublisherDisplayName>t3m3d</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -18,7 +18,7 @@
   </Resources>
   <Applications>
     <Application Id="chimera" Executable="chimera.exe" EntryPoint="Windows.FullTrustApplication">
-      <uap:VisualElements DisplayName="Chimera Linux" Description="Chimera Linux on Windows Subsystem for Linux 2 (musl + LLVM + dinit + apk-tools, FreeBSD userland)" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
+      <uap:VisualElements DisplayName="Chimera Linux WSL" Description="Chimera Linux on Windows Subsystem for Linux 2 (musl + LLVM + dinit + apk-tools, FreeBSD userland)" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square310x310Logo="Assets\LargeTile.png" Square71x71Logo="Assets\SmallTile.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
