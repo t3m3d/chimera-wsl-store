@@ -79,15 +79,15 @@ OK "packed: $msix ($mb MB)"
 # 5. Optional signing.
 if ($Sign) {
     if (-not (Test-Path $CertPath)) { Fail "missing $CertPath -- run .\make-cert.ps1 first" }
-    Say "signtool sign with $CertPath"
     if ($CertPassword) {
         $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($CertPassword)
         $plain = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
         [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
-        & $signTool sign /fd SHA256 /a /f $CertPath /p $plain $msix
     } else {
-        & $signTool sign /fd SHA256 /a /f $CertPath $msix
+        $plain = 'chimera-dev'
     }
+    Say "signtool sign /v with $CertPath"
+    & $signTool sign /fd SHA256 /v /f $CertPath /p $plain $msix
     if ($LASTEXITCODE -ne 0) { Fail "signtool failed (rc=$LASTEXITCODE)" }
     OK "signed"
 } else {
